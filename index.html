@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BeamShield - Secure Beam Services</title>
     <style>
+        /* Global styles */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #2c0069; /* Deep Purple */
             color: white;
+            overflow-x: hidden;
+        }
+
+        /* Animation for text */
+        @keyframes slideIn {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(0); }
         }
 
         /* Header section (Socials) */
@@ -18,10 +26,12 @@
             text-align: center;
             padding: 100px 20px;
             background-color: #4b0082; /* Darker Purple */
+            animation: slideIn 1s ease-out;
         }
         .header h1 {
-            font-size: 48px;
+            font-size: 60px;
             margin-bottom: 20px;
+            animation: slideIn 1s ease-out;
         }
         .socials {
             margin-top: 20px;
@@ -40,22 +50,26 @@
         /* Main Product Section */
         .main-product {
             text-align: center;
-            padding: 80px 20px;
+            padding: 100px 20px;
             background-color: #6600cc; /* Slightly lighter purple */
+            animation: slideIn 1.5s ease-out;
         }
         .main-product h2 {
-            font-size: 36px;
+            font-size: 72px; /* Larger size for main product */
+            font-weight: bold;
             margin-bottom: 20px;
+            animation: slideIn 1.5s ease-out;
         }
         .main-product p {
-            font-size: 20px;
+            font-size: 22px;
             margin-bottom: 30px;
+            animation: slideIn 1.5s ease-out;
         }
         .main-product a {
             background-color: #ff00cc; /* Bright pink/purple */
             color: white;
-            padding: 15px 30px;
-            font-size: 20px;
+            padding: 20px 40px;
+            font-size: 24px;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s;
@@ -69,6 +83,7 @@
             text-align: center;
             padding: 60px 20px;
             background-color: #4b0082;
+            animation: slideIn 2s ease-out;
         }
         .products h3 {
             font-size: 30px;
@@ -83,6 +98,7 @@
             border-radius: 8px;
             text-align: center;
             transition: transform 0.3s;
+            animation: slideIn 2s ease-out;
         }
         .product-item:hover {
             transform: scale(1.05);
@@ -142,6 +158,11 @@
             <h4>Beam Item 3</h4>
             <p>Get your dream Roblox item.</p>
             <a href="https://www.roblox.com/catalog/Item3ID" target="_blank">Buy Item</a>
+        </div>
+        <div class="product-item">
+            <h4>Beam Item 4</h4>
+            <p>Ultimate Roblox item, instantly delivered.</p>
+            <a href="https://www.roblox.com/catalog/Item4ID" target="_blank">Buy Item</a>
         </div>
     </div>
 
