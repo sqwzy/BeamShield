@@ -4,18 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beam Services</title>
-    <link rel="stylesheet" href="style.css"> <!-- External CSS (Optional) -->
     <style>
-        /* CSS for Basic Products Section */
-        .basic-products {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-top: 50px;
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+            overflow-x: hidden;
         }
 
+        h2, h3, h4 {
+            font-weight: bold;
+        }
+
+        /* Black Space Animated Background */
+        .space-background {
+            background: url('https://cdn.pixabay.com/photo/2015/09/18/20/13/space-941084_960_720.jpg') no-repeat center center fixed;
+            background-size: cover;
+            animation: spaceAnimation 30s infinite linear;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            background-position: center;
+        }
+
+        @keyframes spaceAnimation {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 2000px 0;
+            }
+        }
+
+        /* Special Beaming Method */
+        .special-beam {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: rgba(102, 0, 204, 0.8);
+            margin-top: 50px;
+            border-radius: 10px;
+        }
+
+        .special-beam h2 {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .special-beam p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .special-beam a {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #ff66cc;
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .special-beam a:hover {
+            background-color: #6600cc;
+        }
+
+        /* Products Section */
+        .products {
+            padding: 50px;
+            text-align: center;
+        }
+
+        .products h2 {
+            font-size: 48px;
+            margin-bottom: 40px;
+        }
+
+        /* Product Item Styles */
         .product-item {
-            background-color: #6600cc; /* Purple background */
+            background-color: rgba(102, 0, 204, 0.8);
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -23,10 +95,11 @@
             margin: 20px;
             text-align: center;
             transition: transform 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .product-item:hover {
-            transform: scale(1.05); /* Hover effect */
+            transform: scale(1.05);
         }
 
         .product-item h3 {
@@ -59,17 +132,30 @@
         .product-item a:hover {
             background-color: #6600cc;
         }
+
     </style>
 </head>
 <body>
 
-    <!-- Basic Products Section -->
-    <div class="basic-products">
-        <!-- Product 1: Finding Victims -->
+    <!-- Special Beaming Method Section -->
+    <div class="space-background">
+        <div class="special-beam">
+            <h2>🚀 Special Beaming Method 🚀</h2>
+            <p>This exclusive method is perfect for advanced users who want to unlock the best beaming techniques. It comes with powerful tools and strategies to help you get the edge you need. 🚀</p>
+            <a href="your-special-method-zip-file-link" target="_blank">Download Special Beaming Method</a>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products">
+        <h2>💎 Products 💎</h2>
+
+        <!-- Product 1: How to Find Victims -->
         <div class="product-item">
             <h3>🔍 How to Find Victims</h3>
             <p>Learn the techniques to identify vulnerable targets for your beaming activities. These methods will show you how to spot potential victims easily! 💡</p>
             <img src="your-image-link-here.jpg" alt="How to Find Victims" class="product-image">
+            <p>After purchasing, you will receive a ZIP file containing detailed instructions and methods for victim identification. 📂</p>
             <a href="https://www.roblox.com/game-pass/1059109740" target="_blank">Get the Method</a>
         </div>
 
@@ -78,6 +164,7 @@
             <h3>💥 Beginner Beaming Methods</h3>
             <p>Start your journey with basic beaming methods designed for beginners. These techniques are easy to use and perfect for those just starting out! 🌱</p>
             <img src="your-image-link-here.jpg" alt="Beginner Beaming Methods" class="product-image">
+            <p>After purchasing, you'll get a ZIP file with beginner-friendly beaming methods and scripts. 📂</p>
             <a href="https://www.roblox.com/game-pass/1059239753" target="_blank">Get the Method</a>
         </div>
 
@@ -86,6 +173,7 @@
             <h3>⚡ Advanced Beaming Methods</h3>
             <p>For advanced users, these methods provide powerful tools and techniques to take your beaming skills to the next level! 🔥</p>
             <img src="your-image-link-here.jpg" alt="Advanced Beaming Methods" class="product-image">
+            <p>Upon purchase, receive a ZIP file containing high-level beaming techniques and scripts! 📂</p>
             <a href="https://www.roblox.com/game-pass/1059319695" target="_blank">Get the Method</a>
         </div>
     </div>
