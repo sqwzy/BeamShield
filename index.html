@@ -3,171 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeamShield - Secure Beam Services</title>
+    <title>Beam Services</title>
+    <link rel="stylesheet" href="style.css"> <!-- External CSS (Optional) -->
     <style>
-        /* Global styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #2c0069; /* Deep Purple */
-            color: white;
-            overflow-x: hidden;
+        /* CSS for Basic Products Section */
+        .basic-products {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 50px;
         }
 
-        /* Animation for text */
-        @keyframes slideIn {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(0); }
-        }
-
-        /* Header section (Socials) */
-        .header {
-            text-align: center;
-            padding: 100px 20px;
-            background-color: #4b0082; /* Darker Purple */
-            animation: slideIn 1s ease-out;
-        }
-        .header h1 {
-            font-size: 60px;
-            margin-bottom: 20px;
-            animation: slideIn 1s ease-out;
-        }
-        .socials {
-            margin-top: 20px;
-        }
-        .socials a {
-            color: #fff;
-            font-size: 20px;
-            margin: 0 15px;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .socials a:hover {
-            color: #ffcc00;
-        }
-
-        /* Main Product Section */
-        .main-product {
-            text-align: center;
-            padding: 100px 20px;
-            background-color: #6600cc; /* Slightly lighter purple */
-            animation: slideIn 1.5s ease-out;
-        }
-        .main-product h2 {
-            font-size: 72px; /* Larger size for main product */
-            font-weight: bold;
-            margin-bottom: 20px;
-            animation: slideIn 1.5s ease-out;
-        }
-        .main-product p {
-            font-size: 22px;
-            margin-bottom: 30px;
-            animation: slideIn 1.5s ease-out;
-        }
-        .main-product a {
-            background-color: #ff00cc; /* Bright pink/purple */
-            color: white;
-            padding: 20px 40px;
-            font-size: 24px;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .main-product a:hover {
-            background-color: #ff66cc;
-        }
-
-        /* Basic Products Section */
-        .products {
-            text-align: center;
-            padding: 60px 20px;
-            background-color: #4b0082;
-            animation: slideIn 2s ease-out;
-        }
-        .products h3 {
-            font-size: 30px;
-            margin-bottom: 30px;
-        }
         .product-item {
-            display: inline-block;
-            width: 300px; /* Larger width for product boxes */
-            background-color: #6600cc;
-            padding: 30px;
-            margin: 15px;
-            border-radius: 8px;
+            background-color: #6600cc; /* Purple background */
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            margin: 20px;
             text-align: center;
-            transition: transform 0.3s;
-            animation: slideIn 2s ease-out;
+            transition: transform 0.3s ease;
         }
+
         .product-item:hover {
-            transform: scale(1.05);
+            transform: scale(1.05); /* Hover effect */
         }
-        .product-item h4 {
-            margin-bottom: 15px;
+
+        .product-item h3 {
             font-size: 24px;
+            margin-bottom: 15px;
         }
+
         .product-item p {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 20px;
         }
+
+        .product-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
         .product-item a {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #ff00cc;
+            background-color: #ff66cc;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 15px;
-        }
-        .product-item a:hover {
-            background-color: #ff66cc;
+            font-size: 18px;
         }
 
+        .product-item a:hover {
+            background-color: #6600cc;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header Section: Social Media -->
-    <div class="header">
-        <h1>Welcome to BeamShield</h1>
-        <p>Your trusted service for exclusive Roblox beam items.</p>
-        <div class="socials">
-            <a href="https://twitter.com/YourTwitter" target="_blank">Twitter</a>
-            <a href="https://instagram.com/YourInstagram" target="_blank">Instagram</a>
-            <a href="https://discord.com/YourDiscord" target="_blank">Discord</a>
-        </div>
-    </div>
-
-    <!-- Main Product Section -->
-    <div class="main-product">
-        <h2>Exclusive Roblox Beam Services</h2>
-        <p>We offer fast and secure Roblox item beams. Get your desired items with ease!</p>
-        <a href="https://www.roblox.com/catalog/YourItemID" target="_blank">Buy Now</a>
-    </div>
-
     <!-- Basic Products Section -->
-    <div class="products">
-        <h3>Our Basic Products</h3>
+    <div class="basic-products">
+        <!-- Product 1: Finding Victims -->
         <div class="product-item">
-            <h4>Beam Item 1</h4>
-            <p>Fast & secure beam delivery. This item is one of the most popular among Roblox users due to its quick and reliable service. Perfect for any player who wants to instantly upgrade their inventory.</p>
-            <a href="https://www.roblox.com/catalog/Item1ID" target="_blank">Buy Item</a>
+            <h3>🔍 How to Find Victims</h3>
+            <p>Learn the techniques to identify vulnerable targets for your beaming activities. These methods will show you how to spot potential victims easily! 💡</p>
+            <img src="your-image-link-here.jpg" alt="How to Find Victims" class="product-image">
+            <a href="https://www.roblox.com/game-pass/1059109740" target="_blank">Get the Method</a>
         </div>
+
+        <!-- Product 2: Beginner Beaming Methods -->
         <div class="product-item">
-            <h4>Beam Item 2</h4>
-            <p>Exclusive item for your Roblox account. A rare item that provides unique features and is guaranteed to elevate your gameplay. Only available through BeamShield services.</p>
-            <a href="https://www.roblox.com/catalog/Item2ID" target="_blank">Buy Item</a>
+            <h3>💥 Beginner Beaming Methods</h3>
+            <p>Start your journey with basic beaming methods designed for beginners. These techniques are easy to use and perfect for those just starting out! 🌱</p>
+            <img src="your-image-link-here.jpg" alt="Beginner Beaming Methods" class="product-image">
+            <a href="https://www.roblox.com/game-pass/1059239753" target="_blank">Get the Method</a>
         </div>
+
+        <!-- Product 3: Advanced Beaming Methods -->
         <div class="product-item">
-            <h4>Beam Item 3</h4>
-            <p>Get your dream Roblox item delivered directly to you. This item is tailored to enhance your in-game experience with special powers and abilities.</p>
-            <a href="https://www.roblox.com/catalog/Item3ID" target="_blank">Buy Item</a>
-        </div>
-        <div class="product-item">
-            <h4>Beam Item 4</h4>
-            <p>Ultimate Roblox item, instantly delivered. Designed for elite players, this item will give you an edge in the game with exclusive features and advantages.</p>
-            <a href="https://www.roblox.com/catalog/Item4ID" target="_blank">Buy Item</a>
+            <h3>⚡ Advanced Beaming Methods</h3>
+            <p>For advanced users, these methods provide powerful tools and techniques to take your beaming skills to the next level! 🔥</p>
+            <img src="your-image-link-here.jpg" alt="Advanced Beaming Methods" class="product-image">
+            <a href="https://www.roblox.com/game-pass/1059319695" target="_blank">Get the Method</a>
         </div>
     </div>
 
