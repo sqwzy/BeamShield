@@ -1,0 +1,37 @@
+{
+  "CATEGORY_1_ID": 1395537322568847472,
+  "CATEGORY_2_ID": 1395537324019941377,
+  "ELITE_ROLE_ID": 1395537293619626025,
+  "STANDARD_ROLE_ID": 1395537294525599858,
+  "EVERYONE_ROLE_ID": 1393687897189912606,
+  "MEMBER_ROLE_ID": 1395537304667557948,
+  "STAFF_ROLE_ID": 1395537289471463424,
+  "ACCESS_ROLE_ID": 1395537303606268015,
+  "ADMIN_LOG_CHANNEL": 1395537394110959788,
+  "PING_RESET_CHANNEL": 1395537382190612572,
+  "REVOKED_SLOT_CATEGORY_ID": 1395537329082597518,
+  "FIND_COMMAND_EMBED_THUMBNAIL": "https://cdn.discordapp.com/attachments/1261087067849494552/1331550597475860480/message.png?ex=687c08e1&is=687ab761&hm=5de9774eba5d897d31a1c61ed4c6d624c4a77b63b8d44f4bb489bb534547d213&",
+  "FIND_COMMAND_EMBED_IMAGE": "https://cdn.discordapp.com/attachments/1261087067849494552/1331550683476004925/1.png?ex=687c08f5&is=687ab775&hm=befbe9c8f4254635b2d2230cc59eccb8c34c54ffa5f463a31c1e1dcb953c6886&",
+  "YOUR_BOT_TOKEN": "",
+
+
+  "EMOJIS": {
+    "tick": "✅", 
+    "cross": "❌",
+    "warning": "⚠️",
+    "cancel/cross": "🚫",
+    "correct/tick": "☑️",
+    "arrow": "⏩",
+    "refresh": "🔄",
+    "staff": "🛡️",
+    "error": "❗",
+    "rename/pencil": "✏️",
+    "message": "💬",
+    "shield": "🛡️",
+    "gem": "💎",
+    "admin": "👑",
+    "tick_animated": "✅"
+  }
+}
+
+
