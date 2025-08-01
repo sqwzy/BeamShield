@@ -186,7 +186,7 @@ def ping_usage_embed(everyone_used, here_used, plan, custom_limits=None):
         description=f"{CONFIG['EMOJIS']['correct/tick']} **Pings used:** *@everyone* `{everyone_used}/{limits['everyone']}` | *@here* `{here_used}/{limits['here']}`\n\n **Must use https://discord.com/channels/1381299988537282581/1381509144577839195 for secure purchases.**",
         color=discord.Color.blurple()
     )
-    embed.set_footer(text=".gg/elitemp | Ping Tracker")
+    embed.set_footer(text=".gg/vexusfr | Ping Tracker")
     return embed
 
 def slot_info_embed(slot_data, user, channel):
@@ -302,7 +302,7 @@ async def dm_user(user: discord.User, title: str, message: str, color=discord.Co
 async def on_ready():
     print(f"{CONFIG['EMOJIS']['tick']} Logged in as {bot.user} ({bot.user.id})")
 
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=".gg/elitemp"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=".gg/vexusfr"))
 
     # Add persistent views
     bot.add_view(PersistentRecoveryView())
@@ -914,7 +914,7 @@ async def check_expiry_warnings():
         save_json(SLOTS_FILE, slots)
 
 
-@tasks.loop(time=datetime.time(hour=18, minute=30, tzinfo=pytz.utc))
+@tasks.loop(time=datetime.time(hour=0, minute=0, tzinfo=pytz.timezone('Europe/Amsterdam')))
 async def daily_ping_reset():
     slots = load_json(SLOTS_FILE)
     for uid, slot in slots.items():
@@ -952,6 +952,9 @@ async def daily_ping_reset():
                         break
         except Exception:
             pass
+        
+        # First ping the role so it gets notified
+        await alert_chan.send(f"<@&{CONFIG['ACCESS_ROLE_ID']}>")  # Role mention outside embed
         
         # Send new reset message
         await alert_chan.send(embed=timestamp_embed(
@@ -1224,7 +1227,7 @@ async def timeleft(ctx):
         description=f"Your slot will expire in **{str(delta)}**.",
         color=discord.Color.orange()
     )
-    embed.set_footer(text=".gg/elitemp | Time Tracker")
+    embed.set_footer(text=".gg/vexusfr | Time Tracker")
     await ctx.send(embed=embed)
     
 @bot.command()
@@ -1252,7 +1255,7 @@ async def slotstats(ctx):
     for plan, count in plan_counts.items():
         embed.add_field(name=f"{plan.title()} Slots", value=f"`{count}`", inline=True)
 
-    embed.set_footer(text=".gg/elitemp | Slot Overview")
+    embed.set_footer(text=".gg/vexusfr | Slot Overview")
     await ctx.send(embed=embed)
     
 @bot.command()
@@ -1495,7 +1498,7 @@ async def help(ctx):
         inline=False
     )
 
-    embed.set_footer(text=".gg/elitemp | EliteSlots Help Panel")
+    embed.set_footer(text=".gg/vexusfr | EliteSlots Help Panel")
     await ctx.send(embed=embed)  
 
 
