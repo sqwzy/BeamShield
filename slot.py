@@ -188,8 +188,13 @@ class RecoveryView(discord.ui.View):
 
 def ping_usage_embed(everyone_used, here_used, plan, custom_limits=None):
     limits = custom_limits if custom_limits else PING_LIMITS[plan]
+    
+    # Calculate remaining pings
+    everyone_remaining = limits['everyone'] - everyone_used
+    here_remaining = limits['here'] - here_used
+    
     embed = discord.Embed(
-        description=f"{CONFIG['EMOJIS']['correct/tick']} **Pings used:** *@everyone* `{everyone_used}/{limits['everyone']}` | *@here* `{here_used}/{limits['here']}`\n\n **Must use https://discord.com/channels/1381299988537282581/1381509144577839195 for secure purchases.**",
+        description=f"{CONFIG['EMOJIS']['correct/tick']} **Pings remaining:** *@everyone* `{everyone_remaining}` | *@here* `{here_remaining}`\n\n **Must use https://discord.com/channels/1381299988537282581/1381509144577839195 for secure purchases.**",
         color=discord.Color.blurple()
     )
     embed.set_footer(text=".gg/elitemp | Ping Tracker")
@@ -200,61 +205,53 @@ def slot_info_embed(slot_data, user, channel):
     start_dt = datetime.datetime.fromtimestamp(slot_data['start_ts'])
     end_dt = datetime.datetime.fromtimestamp(slot_data['end_ts'])
     
-    # Calculate days until expiry
-    now = datetime.datetime.utcnow()
-    days_left = (end_dt - now).days
-    
     embed = discord.Embed(
-        title="**Slot created**",
-        description="Thanks for choosing Vexus Slots!",
-        color=0xFF8C00  # Orange color
+        title="➤ | Slot Information",
+        color=discord.Color.blue()
     )
     
-    # Owner and Expires side by side
+    # Channel Owner
     embed.add_field(
-        name="Owner:",
-        value=user.mention,
-        inline=True
-    )
-    
-    embed.add_field(
-        name="Expires:",
-        value=f"In **{days_left}** days",
-        inline=True
-    )
-    
-    # Slot ID
-    embed.add_field(
-        name="Slot:",
-        value=f"#{channel.name if channel else 'Unknown'}",
-        inline=True
-    )
-    
-    # Allowed pings and Purchase Date side by side
-    ping_text = f"{limits['here']}x here {limits['everyone']}x everyone"
-    embed.add_field(
-        name="Allowed pings:",
-        value=ping_text,
-        inline=True
-    )
-    
-    embed.add_field(
-        name="Purchase Date:",
-        value=start_dt.strftime("%B %d, %Y"),
-        inline=True
-    )
-    
-    # Add empty field for spacing
-    embed.add_field(name="\u200b", value="\u200b", inline=True)
-    
-    # Recovery key section
-    embed.add_field(
-        name="Users recovery key",
-        value=f"||**`{slot_data['recovery_key']}`**||",
+        name="Channel Owner",
+        value=f"<@{user.id}>\n({user.id})",
         inline=False
     )
     
-    embed.set_footer(text="Created By Vexus Slots")
+    # Slot Channel 
+    embed.add_field(
+        name="Slot Channel",
+        value=f"# {channel.mention if channel else 'Unknown'}",
+        inline=False
+    )
+    
+    # Started on and Expires on side by side
+    embed.add_field(
+        name="Started on",
+        value=start_dt.strftime("%A, %B %d, %Y at %I:%M %p IST"),
+        inline=True
+    )
+    
+    embed.add_field(
+        name="Expires on", 
+        value=end_dt.strftime("%A, %B %d, %Y at %I:%M %p IST"),
+        inline=True
+    )
+    
+    # Pings section
+    ping_text = f"1 x @everyone\n{limits['here']} x @here"
+    embed.add_field(
+        name="Pings",
+        value=ping_text,
+        inline=False
+    )
+    
+    # Important section
+    embed.add_field(
+        name="Important",
+        value="- Follow and respect the slot terms\n- Ping abuse will cause automatic revocation",
+        inline=False
+    )
+    
     return embed
 
 
@@ -395,12 +392,6 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
         "sticky_msg_id": None
     }
     save_json(SLOTS_FILE, slots)
-    await dm_user(
-        user,
-        "🔐 Your Recovery Key",
-        f"||**`{slots[str(user.id)]['recovery_key']}`**||\nKeep this key safe! It's your only way to recover your slot.",
-        color=discord.Color.green()
-    )
 
 
     # Send welcome embed with timestamps and Copy Recovery Key button
@@ -413,12 +404,59 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
     # Send confirmation to ctx
     await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['tick']} Slot created for {user.mention} in {channel.mention}", color=discord.Color.green()))
 
+    # Send slot creation confirmation to user DMs 
+    try:
+        dm_embed = discord.Embed(
+            title="Slot created",
+            description="Thanks for choosing Vexus Slots!",
+            color=0xFF8C00  # Orange color
+        )
+        
+        # Calculate days until expiry for DM
+        now_dt = datetime.datetime.fromtimestamp(now_ts)
+        end_dt = datetime.datetime.fromtimestamp(end_ts)
+        days_left = (end_dt - now_dt).days
+        
+        dm_embed.add_field(name="Owner:", value=user.mention, inline=True)
+        dm_embed.add_field(name="Expires:", value=f"In **{days_left}** days", inline=True)
+        dm_embed.add_field(name="Slot:", value=f"#{channel.name}", inline=True)
+        
+        # Get ping limits for this plan
+        limits = PING_LIMITS[plan]
+        ping_text = f"{limits['here']}x here {limits['everyone']}x everyone"
+        dm_embed.add_field(name="Allowed pings:", value=ping_text, inline=True)
+        dm_embed.add_field(name="Purchase Date:", value=now_dt.strftime("%B %d, %Y"), inline=True)
+        dm_embed.add_field(name="\u200b", value="\u200b", inline=True)  # Empty field for spacing
+        
+        dm_embed.add_field(
+            name="Users recovery key", 
+            value=f"||**`{slots[str(user.id)]['recovery_key']}`**||", 
+            inline=False
+        )
+        dm_embed.set_footer(text="Created By Vexus Slots")
+        
+        await user.send(embed=dm_embed)
+        
+        # Also send the "Recovery key sent to your DMs!" message in channel
+        recovery_sent_embed = discord.Embed(
+            description=f"{CONFIG['EMOJIS']['tick']} Recovery key sent to your DMs!",
+            color=discord.Color.green()
+        )
+        await channel.send(embed=recovery_sent_embed, delete_after=10)
+        
+    except discord.Forbidden:
+        # If DMs are disabled, just send a message in the channel
+        await channel.send(embed=discord.Embed(
+            description=f"{CONFIG['EMOJIS']['warning']} Could not send DM. Please enable DMs from server members to receive your recovery key.",
+            color=discord.Color.orange()
+        ), delete_after=15)
+
     # Log creation in admin channel
     log_chan = bot.get_channel(ADMIN_LOG_CHANNEL)
     if log_chan:
         await log_chan.send(embed=timestamp_embed(
             f"{CONFIG['EMOJIS']['correct/tick']} Slot Created",
-            f"Slot `{channel.name}` created for {user.mention} by {ctx.author.mention}\nPlan: {plan.title()}\nExpires: <t:{end_ts}:F>",
+            f"**Slot:** {channel.mention} (`{channel.name}`)\n**User:** {user.mention} (`{user.id}`)\n**Created by:** {ctx.author.mention}\n**Plan:** {plan.title()}\n**Duration:** {duration} {unit}\n**Expires:** <t:{end_ts}:F>",
             discord.Color.green()
         ))
 
@@ -1061,8 +1099,8 @@ async def on_message(message):
                 log_chan = bot.get_channel(ADMIN_LOG_CHANNEL)
                 if log_chan:
                     await log_chan.send(embed=timestamp_embed(
-                        f"{CONFIG['EMOJIS']['warning']} Auto Revoke",
-                        f"Slot for {user.mention} auto-revoked for ping abuse.",
+                        f"{CONFIG['EMOJIS']['warning']} Auto Revoke - Ping Abuse",
+                        f"Slot for {user.mention} (`{user.id}`) auto-revoked for ping abuse.\nChannel: {channel.mention}\nEveryone used: {slot['everyone_used']}/{limits['everyone']}\nHere used: {slot['here_used']}/{limits['here']}",
                         discord.Color.red()
                     ))
                 return
@@ -1083,16 +1121,35 @@ async def on_message(message):
                 slot["sticky_msg_id"] = msg.id
                 save_json(SLOTS_FILE, slots)
                 
-                # Send self-destruct notification
+                # Send self-destruct notification with remaining pings
+                limits = slot.get("custom_limits", PING_LIMITS[slot["plan"]])
+                everyone_remaining = limits['everyone'] - slot["everyone_used"]
+                here_remaining = limits['here'] - slot["here_used"]
+                
                 self_destruct_embed = discord.Embed(
                     title="Ping Used",
-                    description=f"Ping used by {message.author.mention}",
+                    description=f"Ping used by {message.author.mention}\n\n**Pings remaining:** @everyone `{everyone_remaining}` | @here `{here_remaining}`",
                     color=discord.Color.orange()
                 )
                 self_destruct_msg = await message.channel.send(embed=self_destruct_embed)
                 
                 # Start countdown in background
                 asyncio.create_task(self_destruct_message(self_destruct_msg, 10))
+                
+                # Log ping usage to admin channel
+                log_chan = bot.get_channel(ADMIN_LOG_CHANNEL)
+                if log_chan:
+                    ping_type = ""
+                    if "@everyone" in message.content:
+                        ping_type += "@everyone "
+                    if "@here" in message.content:
+                        ping_type += "@here "
+                    
+                    await log_chan.send(embed=timestamp_embed(
+                        f"{CONFIG['EMOJIS']['warning']} Ping Used",
+                        f"User: {message.author.mention} (`{message.author.id}`)\nChannel: {message.channel.mention}\nPing type: {ping_type.strip()}\nRemaining: @everyone `{everyone_remaining}` | @here `{here_remaining}`",
+                        discord.Color.orange()
+                    ))
 
     await bot.process_commands(message)
 
