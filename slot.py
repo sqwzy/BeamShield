@@ -179,12 +179,6 @@ async def self_destruct_message(message, countdown_time=10):
                 discord.Color.orange()
             ))
 
-class RecoveryView(discord.ui.View):
-    @discord.ui.button(label="Recover Slot", style=discord.ButtonStyle.success, custom_id="recover_slot_btn")
-    async def recover_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(RecoveryModal())
-
-
 
 def ping_usage_embed(everyone_used, here_used, plan, custom_limits=None):
     limits = custom_limits if custom_limits else PING_LIMITS[plan]
@@ -500,7 +494,7 @@ async def sendrecoverypanel(ctx):
         color=discord.Color.green()
     )
     embed.set_footer(text="Elite Key System • Recovery Panel")
-    await ctx.send(embed=embed, view=RecoveryView())
+    await ctx.send(embed=embed, view=PersistentRecoveryView())
 
 
 
