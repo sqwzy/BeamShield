@@ -95,7 +95,38 @@ class RecoveryModal(discord.ui.Modal, title="🔐 Tier Recovery • Slot Key"):
         except:
             pass
 
-        new_welcome = await channel.send(embed=slot_info_embed(slots[matched_uid], new_user, channel))
+        embed = slot_info_embed(slots[matched_uid], new_user, channel)
+        view = CopyRecoveryKeyView(slots[matched_uid]["recovery_key"], new_user.id)
+        new_welcome = await channel.send(embed=embed, view=view)
+
+
+class PersistentRecoveryView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Recover Slot", style=discord.ButtonStyle.green, emoji="🔐", custom_id="recover_slot_button")
+    async def recover_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(RecoveryModal())
+
+
+async def self_destruct_message(message, countdown_time=10):
+    """Add a self-destruct countdown to a message and delete it after countdown"""
+    for i in range(countdown_time, 0, -1):
+        try:
+            embed = discord.Embed(
+                description=f"This message will self destruct in **{i}** seconds",
+                color=discord.Color.red()
+            )
+            embed.set_footer(text="⚠️ Auto-delete countdown")
+            await message.edit(embed=embed)
+            await asyncio.sleep(1)
+        except:
+            return
+    
+    try:
+        await message.delete()
+    except:
+        pass
 
         # Remove old roles from previous owner
         guild = interaction.guild
@@ -155,8 +186,8 @@ class RecoveryView(discord.ui.View):
 
 
 
-def ping_usage_embed(everyone_used, here_used, plan):
-    limits = PING_LIMITS[plan]
+def ping_usage_embed(everyone_used, here_used, plan, custom_limits=None):
+    limits = custom_limits if custom_limits else PING_LIMITS[plan]
     embed = discord.Embed(
         description=f"{CONFIG['EMOJIS']['correct/tick']} **Pings used:** *@everyone* `{everyone_used}/{limits['everyone']}` | *@here* `{here_used}/{limits['here']}`\n\n **Must use https://discord.com/channels/1381299988537282581/1381509144577839195 for secure purchases.**",
         color=discord.Color.blurple()
@@ -165,22 +196,93 @@ def ping_usage_embed(everyone_used, here_used, plan):
     return embed
 
 def slot_info_embed(slot_data, user, channel):
-    limits = PING_LIMITS[slot_data['plan']]
+    limits = slot_data.get("custom_limits", PING_LIMITS[slot_data['plan']])
     start_dt = datetime.datetime.fromtimestamp(slot_data['start_ts'])
     end_dt = datetime.datetime.fromtimestamp(slot_data['end_ts'])
+    
+    # Calculate days until expiry
+    now = datetime.datetime.utcnow()
+    days_left = (end_dt - now).days
+    
     embed = discord.Embed(
-        title=f"{CONFIG['EMOJIS']['arrow']} ┃ Slot Information",
-        color=discord.Color.green(),
-        timestamp=datetime.datetime.utcnow()
+        title="**Slot created**",
+        description="Thanks for choosing Vexus Slots!",
+        color=0xFF8C00  # Orange color
     )
-    embed.add_field(name="Channel Owner", value=f"{user.mention}(`{user.id}`)", inline=False)
-    embed.add_field(name="Slot Channel", value=channel.mention if channel else "Unknown", inline=False)
-    embed.add_field(name="Started on", value=start_dt.strftime("`%A, %B %d, %Y at %I:%M %p IST`"), inline=True)
-    embed.add_field(name="Expires on", value=end_dt.strftime("`%A, %B %d, %Y at %I:%M %p IST`"), inline=True)
-    embed.add_field(name="Pings", value=f"> `{limits['everyone']}`× @everyone\n> `{limits['here']}`× @here", inline=False)
-    embed.add_field(name="Important", value="```- Follow and respect the slot terms\n- Ping abuse will cause automatic revocation```", inline=False)
-    embed.set_footer(text=".gg/elitemp | Thanks for Choosing us!")
+    
+    # Owner and Expires side by side
+    embed.add_field(
+        name="Owner:",
+        value=user.mention,
+        inline=True
+    )
+    
+    embed.add_field(
+        name="Expires:",
+        value=f"In **{days_left}** days",
+        inline=True
+    )
+    
+    # Slot ID
+    embed.add_field(
+        name="Slot:",
+        value=f"#{channel.name if channel else 'Unknown'}",
+        inline=True
+    )
+    
+    # Allowed pings and Purchase Date side by side
+    ping_text = f"{limits['here']}x here {limits['everyone']}x everyone"
+    embed.add_field(
+        name="Allowed pings:",
+        value=ping_text,
+        inline=True
+    )
+    
+    embed.add_field(
+        name="Purchase Date:",
+        value=start_dt.strftime("%B %d, %Y"),
+        inline=True
+    )
+    
+    # Add empty field for spacing
+    embed.add_field(name="\u200b", value="\u200b", inline=True)
+    
+    # Recovery key section
+    embed.add_field(
+        name="Users recovery key",
+        value=f"||**`{slot_data['recovery_key']}`**||",
+        inline=False
+    )
+    
+    embed.set_footer(text="Created By Vexus Slots")
     return embed
+
+
+class CopyRecoveryKeyView(discord.ui.View):
+    def __init__(self, recovery_key, user_id):
+        super().__init__(timeout=None)
+        self.recovery_key = recovery_key
+        self.user_id = user_id
+
+    @discord.ui.button(label="Copy Recovery Key", style=discord.ButtonStyle.gray, emoji="🔐", custom_id="copy_recovery_key")
+    async def copy_recovery_key(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            return await interaction.response.send_message(
+                f"{CONFIG['EMOJIS']['cross']} You can only copy your own recovery key.",
+                ephemeral=True
+            )
+        
+        try:
+            await interaction.user.send(f"🔐 **Your Recovery Key:** ||**`{self.recovery_key}`**||")
+            await interaction.response.send_message(
+                f"{CONFIG['EMOJIS']['tick']} Recovery key sent to your DMs!",
+                ephemeral=True
+            )
+        except discord.Forbidden:
+            await interaction.response.send_message(
+                f"{CONFIG['EMOJIS']['cross']} Could not send DM. Please enable DMs from server members.",
+                ephemeral=True
+            )
 
 def parse_duration(duration: int, unit: str) -> int:
     unit = unit.lower()
@@ -207,6 +309,9 @@ async def on_ready():
     print(f"{CONFIG['EMOJIS']['tick']} Logged in as {bot.user} ({bot.user.id})")
 
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=".gg/elitemp"))
+
+    # Add persistent views
+    bot.add_view(PersistentRecoveryView())
 
     check_expired_slots.start()
     daily_ping_reset.start()
@@ -252,8 +357,7 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
         return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Category ID for `{plan}` not found.", color=discord.Color.red()))
 
     
-    emoji = "💜" if plan == "elite" else "💚"
-    channel_name = f"{emoji}┃{slot_name}".lower().replace(" ", "-")
+    channel_name = f"ᯓ・{slot_name}".lower().replace(" ", "-")
 
     channel = await guild.create_text_channel(channel_name, overwrites=overwrites, category=category)
         # Assign roles based on plan
@@ -299,9 +403,10 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
     )
 
 
-    # Send welcome embed with timestamps
+    # Send welcome embed with timestamps and Copy Recovery Key button
     embed = slot_info_embed(slots[str(user.id)], user, channel)
-    welcome_msg = await channel.send(embed=embed)
+    view = CopyRecoveryKeyView(slots[str(user.id)]["recovery_key"], user.id)
+    welcome_msg = await channel.send(embed=embed, view=view)
     slots[str(user.id)]["welcome_msg_id"] = welcome_msg.id
     save_json(SLOTS_FILE, slots)
 
@@ -318,10 +423,20 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
         ))
 
 @bot.command()
-@commands.has_permissions(administrator=True)
-async def nuke(ctx, user: discord.Member):
+async def nuke(ctx, user: discord.Member = None):
+    # If no user specified, use command author
+    if user is None:
+        user = ctx.author
+    
     uid = str(user.id)
     slots = load_json(SLOTS_FILE)
+
+    # Check if user has permission or owns the slot
+    if not ctx.author.guild_permissions.administrator and str(ctx.author.id) != uid:
+        return await ctx.send(embed=discord.Embed(
+            description=f"{CONFIG['EMOJIS']['cross']} You can only nuke your own slot.",
+            color=discord.Color.red()
+        ))
 
     if uid not in slots:
         return await ctx.send(embed=discord.Embed(
@@ -338,25 +453,40 @@ async def nuke(ctx, user: discord.Member):
         ))
 
     try:
-        # Only delete messages that are NOT the welcome message
-        def preserve_welcome(msg):
-            return msg.id != slot.get("welcome_msg_id")
+        # Purge all messages
+        await channel.purge(limit=1000)
 
-        await channel.purge(limit=1000, check=preserve_welcome)
+        # Reset ping usage
+        slot["everyone_used"] = 0
+        slot["here_used"] = 0
+        
+        # Send new welcome message
+        embed = slot_info_embed(slot, user, channel)
+        view = CopyRecoveryKeyView(slot["recovery_key"], user.id)
+        welcome_msg = await channel.send(embed=embed, view=view)
+        slot["welcome_msg_id"] = welcome_msg.id
+        
+        # Send new ping tracker
+        ping_embed = ping_usage_embed(0, 0, slot["plan"], slot.get("custom_limits"))
+        ping_msg = await channel.send(embed=ping_embed)
+        slot["sticky_msg_id"] = ping_msg.id
+        
+        save_json(SLOTS_FILE, slots)
 
-        await ctx.send(embed=discord.Embed(
-            description=f"{CONFIG['EMOJIS']['tick']} Nuked slot channel for {user.mention} (except welcome/info message).",
-            color=discord.Color.green()
-        ))
+        if ctx.channel != channel:
+            await ctx.send(embed=discord.Embed(
+                description=f"{CONFIG['EMOJIS']['tick']} Successfully nuked and reset slot for {user.mention}.",
+                color=discord.Color.green()
+            ))
 
         await channel.send(embed=discord.Embed(
-            description=f"{CONFIG['EMOJIS']['warning']} This slot was manually purged by {ctx.author.mention}.",
+            description=f"{CONFIG['EMOJIS']['warning']} This slot was nuked and reset by {ctx.author.mention}.",
             color=discord.Color.blurple()
         ))
 
     except Exception as e:
         await ctx.send(embed=discord.Embed(
-            description=f"{CONFIG['EMOJIS']['cancel/cross']} Failed to purge: `{str(e)}`",
+            description=f"{CONFIG['EMOJIS']['cancel/cross']} Failed to nuke: `{str(e)}`",
             color=discord.Color.red()
         ))
 
@@ -558,6 +688,15 @@ async def hold(ctx, user: discord.Member, *, reason: str):
     # Remove send perms for user
     await channel.set_permissions(user, send_messages=False)
 
+    # Add on-hold role if configured
+    if CONFIG["ON_HOLD_ROLE_ID"] != 0:
+        hold_role = ctx.guild.get_role(CONFIG["ON_HOLD_ROLE_ID"])
+        if hold_role:
+            try:
+                await user.add_roles(hold_role)
+            except:
+                pass
+
     slot["held"] = True
     save_json(SLOTS_FILE, slots)
 
@@ -633,6 +772,15 @@ async def unhold(ctx, user: discord.Member):
     # Restore send perms for user
     await channel.set_permissions(user, send_messages=True)
 
+    # Remove on-hold role if configured
+    if CONFIG["ON_HOLD_ROLE_ID"] != 0:
+        hold_role = ctx.guild.get_role(CONFIG["ON_HOLD_ROLE_ID"])
+        if hold_role:
+            try:
+                await user.remove_roles(hold_role)
+            except:
+                pass
+
     slot["held"] = False
     save_json(SLOTS_FILE, slots)
 
@@ -659,10 +807,7 @@ async def pings(ctx):
         return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} You do not own an active slot.", color=discord.Color.red()))
     slot = slots[uid]
 
-    if ctx.channel.id != slot["channel_id"]:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} This command must be run in your slot channel.", color=discord.Color.red()))
-
-    embed = ping_usage_embed(slot["everyone_used"], slot["here_used"], slot["plan"])
+    embed = ping_usage_embed(slot["everyone_used"], slot["here_used"], slot["plan"], slot.get("custom_limits"))
     await ctx.send(embed=embed)
     
 @bot.command()
@@ -793,7 +938,7 @@ async def daily_ping_reset():
             pass
 
         try:
-            embed = ping_usage_embed(0, 0, slot["plan"])
+            embed = ping_usage_embed(0, 0, slot["plan"], slot.get("custom_limits"))
             msg = await channel.send(embed=embed)
             slot["sticky_msg_id"] = msg.id
         except Exception:
@@ -803,6 +948,18 @@ async def daily_ping_reset():
 
     alert_chan = bot.get_channel(PING_RESET_ALERT_CHANNEL)
     if alert_chan:
+        # Delete the old reset message if it exists
+        try:
+            async for message in alert_chan.history(limit=50):
+                if message.author == bot.user and message.embeds:
+                    embed = message.embeds[0]
+                    if embed.title and "Ping Reset" in embed.title:
+                        await message.delete()
+                        break
+        except Exception:
+            pass
+        
+        # Send new reset message
         await alert_chan.send(embed=timestamp_embed(
             "> **Ping Reset**",
             "-# All slot ping counters have been reset and messages purged.",
@@ -813,6 +970,14 @@ async def daily_ping_reset():
 async def on_message(message):
     if message.author.bot:
         return
+
+    # Auto-react to messages in suggestion channel
+    if CONFIG["SUGGESTION_CHANNEL_ID"] != 0 and message.channel.id == CONFIG["SUGGESTION_CHANNEL_ID"]:
+        try:
+            await message.add_reaction("👍")
+            await message.add_reaction("👎")
+        except:
+            pass
 
     slots = load_json(SLOTS_FILE)
     uid = str(message.author.id)
@@ -835,7 +1000,7 @@ async def on_message(message):
             # Check ping abuse:
             content_lower = message.content.lower()
             used_ping = False
-            limits = PING_LIMITS[slot["plan"]]
+            limits = slot.get("custom_limits", PING_LIMITS[slot["plan"]])
 
             # Only count exact mentions (case-insensitive)
             if "@everyone" in message.content:
@@ -912,10 +1077,22 @@ async def on_message(message):
                 except:
                     pass
 
-                embed = ping_usage_embed(slot["everyone_used"], slot["here_used"], slot["plan"])
+                # Send ping usage embed
+                embed = ping_usage_embed(slot["everyone_used"], slot["here_used"], slot["plan"], slot.get("custom_limits"))
                 msg = await message.channel.send(embed=embed)
                 slot["sticky_msg_id"] = msg.id
                 save_json(SLOTS_FILE, slots)
+                
+                # Send self-destruct notification
+                self_destruct_embed = discord.Embed(
+                    title="Ping Used",
+                    description=f"Ping used by {message.author.mention}",
+                    color=discord.Color.orange()
+                )
+                self_destruct_msg = await message.channel.send(embed=self_destruct_embed)
+                
+                # Start countdown in background
+                asyncio.create_task(self_destruct_message(self_destruct_msg, 10))
 
     await bot.process_commands(message)
 
@@ -1107,7 +1284,9 @@ async def resendinfo(ctx):
                 pass
 
         # Send new welcome embed
-        new_msg = await channel.send(embed=slot_info_embed(slot, user, channel))
+        embed = slot_info_embed(slot, user, channel)
+        view = CopyRecoveryKeyView(slot["recovery_key"], user.id)
+        new_msg = await channel.send(embed=embed, view=view)
         slot["welcome_msg_id"] = new_msg.id
         updated += 1
 
@@ -1177,7 +1356,7 @@ async def pingsreset(ctx):
             pass
 
         try:
-            embed = ping_usage_embed(0, 0, slot["plan"])
+            embed = ping_usage_embed(0, 0, slot["plan"], slot.get("custom_limits"))
             msg = await channel.send(embed=embed)
             slot["sticky_msg_id"] = msg.id
             updated_count += 1
@@ -1204,6 +1383,83 @@ async def pingsreset(ctx):
     ))
     
 @bot.command()
+@commands.has_permissions(administrator=True)
+async def addp(ctx, user: discord.Member, *, pings: str):
+    """Add extra pings to a user. Usage: =addp @user 1x here 1x everyone"""
+    slots = load_json(SLOTS_FILE)
+    uid = str(user.id)
+    
+    if uid not in slots:
+        return await ctx.send(embed=discord.Embed(
+            description=f"{CONFIG['EMOJIS']['cross']} This user does not have an active slot.",
+            color=discord.Color.red()
+        ))
+    
+    slot = slots[uid]
+    
+    # Parse ping additions
+    ping_parts = pings.lower().split()
+    here_add = 0
+    everyone_add = 0
+    
+    try:
+        i = 0
+        while i < len(ping_parts):
+            if ping_parts[i].endswith('x'):
+                amount = int(ping_parts[i][:-1])
+                if i + 1 < len(ping_parts):
+                    ping_type = ping_parts[i + 1]
+                    if ping_type == "here":
+                        here_add += amount
+                    elif ping_type == "everyone":
+                        everyone_add += amount
+                i += 2
+            else:
+                i += 1
+    except:
+        return await ctx.send(embed=discord.Embed(
+            description=f"{CONFIG['EMOJIS']['cross']} Invalid format. Use: `=addp @user 1x here 1x everyone`",
+            color=discord.Color.red()
+        ))
+    
+    # Update ping limits (not usage, but available pings)
+    limits = PING_LIMITS[slot["plan"]].copy()
+    limits["here"] += here_add
+    limits["everyone"] += everyone_add
+    
+    # Store the updated limits in the slot
+    if "custom_limits" not in slot:
+        slot["custom_limits"] = PING_LIMITS[slot["plan"]].copy()
+    slot["custom_limits"]["here"] += here_add
+    slot["custom_limits"]["everyone"] += everyone_add
+    
+    save_json(SLOTS_FILE, slots)
+    
+    await ctx.send(embed=discord.Embed(
+        title=f"{CONFIG['EMOJIS']['tick']} Pings Added",
+        description=f"Added **{here_add}x @here** and **{everyone_add}x @everyone** to {user.mention}",
+        color=discord.Color.green()
+    ))
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def purge(ctx):
+    try:
+        deleted = await ctx.channel.purge()
+        embed = discord.Embed(
+            title=f"{CONFIG['EMOJIS']['purge']} Channel Purged",
+            description=f"**{ctx.channel.mention}** successfully purged {CONFIG['EMOJIS']['tick']}",
+            color=discord.Color.green()
+        )
+        embed.set_footer(text="All messages have been removed")
+        await ctx.send(embed=embed)
+    except Exception as e:
+        await ctx.send(embed=discord.Embed(
+            description=f"{CONFIG['EMOJIS']['cross']} Failed to purge channel: {str(e)}",
+            color=discord.Color.red()
+        ))
+
+@bot.command()
 async def help(ctx):
     embed = discord.Embed(
         title=f"{CONFIG['EMOJIS']['message']} Help Menu • Slot Commands",
@@ -1217,7 +1473,7 @@ async def help(ctx):
             "> - **`=slotinfo [user]`** — View slot info.\n"
             "> - **`=pings`** — View remaining `@here` & `@everyone` pings.\n"
             "> - **`=timeleft`** — See when your slot expires.\n"
-            "> - **`=nuke`** {CONFIG['EMOJIS']['shield']} — Clean slot messages.\n"
+            "> - **`=nuke [user]`** — Clean and reset slot messages.\n"
             "> - **`=transfer <old> <new>`** {CONFIG['EMOJIS']['shield']} — Transfer a slot to another user.\n"
         ),
         inline=False
@@ -1239,6 +1495,8 @@ async def help(ctx):
             "> - **`=genslotkey`** — Generate & DM recovery keys.\n"
             "> - **`=slotstats`** — Show active/revoked slot counts.\n"
             "> - **`=pingsreset`** — Manually reset pings.\n"
+            "> - **`=addp <user> <pings>`** — Add extra pings to user.\n"
+            "> - **`=purge`** — Purge all messages in current channel.\n"
         ),
         inline=False
     )
