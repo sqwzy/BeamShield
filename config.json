@@ -7,6 +7,8 @@
   "MEMBER_ROLE_ID": 1395537304667557948,
   "STAFF_ROLE_ID": 1395537289471463424,
   "ACCESS_ROLE_ID": 1395537303606268015,
+  "ON_HOLD_ROLE_ID": 0,
+  "SUGGESTION_CHANNEL_ID": 0,
   "ADMIN_LOG_CHANNEL": 1395537394110959788,
   "PING_RESET_CHANNEL": 1395537382190612572,
   "REVOKED_SLOT_CATEGORY_ID": 1395537329082597518,
@@ -16,21 +18,22 @@
 
 
   "EMOJIS": {
-    "tick": "✅", 
-    "cross": "❌",
-    "warning": "⚠️",
-    "cancel/cross": "🚫",
-    "correct/tick": "☑️",
-    "arrow": "⏩",
-    "refresh": "🔄",
-    "staff": "🛡️",
-    "error": "❗",
-    "rename/pencil": "✏️",
-    "message": "💬",
-    "shield": "🛡️",
-    "gem": "💎",
-    "admin": "👑",
-    "tick_animated": "✅"
+    "tick": "<:tick:000000000000000000>", 
+    "cross": "<:cross:000000000000000000>",
+    "warning": "<:warning:000000000000000000>",
+    "cancel/cross": "<:cancel:000000000000000000>",
+    "correct/tick": "<:correct:000000000000000000>",
+    "arrow": "<:arrow:000000000000000000>",
+    "refresh": "<:refresh:000000000000000000>",
+    "staff": "<:staff:000000000000000000>",
+    "error": "<:error:000000000000000000>",
+    "rename/pencil": "<:pencil:000000000000000000>",
+    "message": "<:message:000000000000000000>",
+    "shield": "<:shield:000000000000000000>",
+    "gem": "<:gem:000000000000000000>",
+    "admin": "<:admin:000000000000000000>",
+    "tick_animated": "<a:tick_animated:000000000000000000>",
+    "purge": "<:purge:000000000000000000>"
   }
 }
 
