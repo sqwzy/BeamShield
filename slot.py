@@ -183,10 +183,10 @@ async def self_destruct_message(message, countdown_time=10):
 def ping_usage_embed(everyone_used, here_used, plan, custom_limits=None):
     limits = custom_limits if custom_limits else PING_LIMITS[plan]
     embed = discord.Embed(
-        description=f"{CONFIG['EMOJIS']['correct/tick']} **Pings used:** *@everyone* `{everyone_used}/{limits['everyone']}` | *@here* `{here_used}/{limits['here']}`\n\n **Must use https://discord.com/channels/1381299988537282581/1381509144577839195 for secure purchases.**",
+        description=f"{CONFIG['EMOJIS']['correct_tick']} **Pings used:** *@everyone* `{everyone_used}/{limits['everyone']}` | *@here* `{here_used}/{limits['here']}`\n\n **Must use https://discord.com/channels/1381299988537282581/1381509144577839195 for secure purchases.**",
         color=discord.Color.blurple()
     )
-    embed.set_footer(text=".gg/elitemp | Ping Tracker")
+    embed.set_footer(text=".gg/vexus | Ping Tracker")
     return embed
 
 def slot_info_embed(slot_data, user, channel):
@@ -302,7 +302,7 @@ async def dm_user(user: discord.User, title: str, message: str, color=discord.Co
 async def on_ready():
     print(f"{CONFIG['EMOJIS']['tick']} Logged in as {bot.user} ({bot.user.id})")
 
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=".gg/elitemp"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=".gg/vexus"))
 
     # Add persistent views
     bot.add_view(PersistentRecoveryView())
@@ -318,7 +318,7 @@ async def on_ready():
 async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str, *, slot_name: str):
     plan = plan.lower()
     if plan not in CATEGORIES:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Invalid plan/category. Choose from: {', '.join(CATEGORIES.keys())}", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Invalid plan/category. Choose from: {', '.join(CATEGORIES.keys())}", color=discord.Color.red()))
 
     try:
         dur_seconds = parse_duration(duration, unit)
@@ -330,7 +330,7 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
 
     # Prevent duplicate slots per user
     if str(user.id) in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} User already has an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} User already has an active slot.", color=discord.Color.red()))
 
     # Create channel overwrites
     guild = ctx.guild
@@ -348,7 +348,7 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
 
     category = guild.get_channel(CATEGORIES[plan])
     if not category:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Category ID for `{plan}` not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Category ID for `{plan}` not found.", color=discord.Color.red()))
 
     
     channel_name = f"ᯓ・{slot_name}".lower().replace(" ", "-")
@@ -411,7 +411,7 @@ async def create(ctx, user: discord.Member, duration: int, unit: str, plan: str,
     log_chan = bot.get_channel(ADMIN_LOG_CHANNEL)
     if log_chan:
         await log_chan.send(embed=timestamp_embed(
-            f"{CONFIG['EMOJIS']['correct/tick']} Slot Created",
+            f"{CONFIG['EMOJIS']['correct_tick']} Slot Created",
             f"Slot `{channel.name}` created for {user.mention} by {ctx.author.mention}\nPlan: {plan.title()}\nExpires: <t:{end_ts}:F>",
             discord.Color.green()
         ))
@@ -434,7 +434,7 @@ async def nuke(ctx, user: discord.Member = None):
 
     if uid not in slots:
         return await ctx.send(embed=discord.Embed(
-            description=f"{CONFIG['EMOJIS']['cancel/cross']} This user does not have an active slot.",
+            description=f"{CONFIG['EMOJIS']['cross']} This user does not have an active slot.",
             color=discord.Color.red()
         ))
 
@@ -442,7 +442,7 @@ async def nuke(ctx, user: discord.Member = None):
     channel = bot.get_channel(slot['channel_id'])
     if not channel:
         return await ctx.send(embed=discord.Embed(
-            description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.",
+            description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.",
             color=discord.Color.red()
         ))
 
@@ -480,7 +480,7 @@ async def nuke(ctx, user: discord.Member = None):
 
     except Exception as e:
         await ctx.send(embed=discord.Embed(
-            description=f"{CONFIG['EMOJIS']['cancel/cross']} Failed to nuke: `{str(e)}`",
+            description=f"{CONFIG['EMOJIS']['cross']} Failed to nuke: `{str(e)}`",
             color=discord.Color.red()
         ))
 
@@ -493,7 +493,7 @@ async def sendrecoverypanel(ctx):
         description="If you've lost access to your channel, you can use your **Private Recovery Key** to initiate a recovery.\n\n**Click the button below to begin the process.**",
         color=discord.Color.green()
     )
-    embed.set_footer(text="Elite Key System • Recovery Panel")
+    embed.set_footer(text="Vexus Key System • Recovery Panel")
     await ctx.send(embed=embed, view=PersistentRecoveryView())
 
 
@@ -506,7 +506,7 @@ async def revoke(ctx, user: discord.Member, *, reason: str = "No reason provided
 
     uid = str(user.id)
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} No active slot found for {user.mention}.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} No active slot found for {user.mention}.", color=discord.Color.red()))
 
     slot = slots[uid]
         # Remove roles based on plan
@@ -524,7 +524,7 @@ async def revoke(ctx, user: discord.Member, *, reason: str = "No reason provided
 
     channel = bot.get_channel(slot['channel_id'])
     if not channel:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.", color=discord.Color.red()))
 
     # Set permissions: hide from everyone, read-only for user
     # Reset permissions
@@ -557,13 +557,13 @@ async def revoke(ctx, user: discord.Member, *, reason: str = "No reason provided
 
     # Send revoke message in slot channel
     await channel.send(embed=timestamp_embed(
-        f"{CONFIG['EMOJIS']['cancel/cross']} Slot Revoked",
+        f"{CONFIG['EMOJIS']['cross']} Slot Revoked",
         f"Your slot has been revoked by staff.\n\nReason: {reason}",
         discord.Color.red()
     ))
 
     # DM user about revocation
-    await dm_user(user, f"{CONFIG['EMOJIS']['cancel/cross']} Slot Revoked", f"Your slot has been revoked.\nReason: {reason}", discord.Color.red())
+    await dm_user(user, f"{CONFIG['EMOJIS']['cross']} Slot Revoked", f"Your slot has been revoked.\nReason: {reason}", discord.Color.red())
 
     # Move slot data to revoked file
     revoked[uid] = slot
@@ -592,12 +592,12 @@ async def restore(ctx, user: discord.Member):
     uid = str(user.id)
 
     if uid not in revoked:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} No revoked slot found for {user.mention}.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} No revoked slot found for {user.mention}.", color=discord.Color.red()))
 
     slot = revoked[uid]
     channel = bot.get_channel(slot["channel_id"])
     if not channel:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.", color=discord.Color.red()))
 
     slot['everyone_used'] = 0
     slot['here_used'] = 0
@@ -669,7 +669,7 @@ async def hold(ctx, user: discord.Member, *, reason: str):
     uid = str(user.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} No active slot found for {user.mention}.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} No active slot found for {user.mention}.", color=discord.Color.red()))
     slot = slots[uid]
 
     if slot.get("held"):
@@ -677,7 +677,7 @@ async def hold(ctx, user: discord.Member, *, reason: str):
 
     channel = bot.get_channel(slot["channel_id"])
     if not channel:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.", color=discord.Color.red()))
 
     # Remove send perms for user
     await channel.set_permissions(user, send_messages=False)
@@ -753,7 +753,7 @@ async def unhold(ctx, user: discord.Member):
     uid = str(user.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} No active slot found for {user.mention}.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} No active slot found for {user.mention}.", color=discord.Color.red()))
     slot = slots[uid]
 
     if not slot.get("held"):
@@ -761,7 +761,7 @@ async def unhold(ctx, user: discord.Member):
 
     channel = bot.get_channel(slot["channel_id"])
     if not channel:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.", color=discord.Color.red()))
 
     # Restore send perms for user
     await channel.set_permissions(user, send_messages=True)
@@ -798,7 +798,7 @@ async def pings(ctx):
     uid = str(ctx.author.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} You do not own an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} You do not own an active slot.", color=discord.Color.red()))
     slot = slots[uid]
 
     embed = ping_usage_embed(slot["everyone_used"], slot["here_used"], slot["plan"], slot.get("custom_limits"))
@@ -812,7 +812,7 @@ async def slotinfo(ctx, user: discord.Member = None):
     uid = str(user.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} This user does not have an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} This user does not have an active slot.", color=discord.Color.red()))
     slot = slots[uid]
     channel = bot.get_channel(slot["channel_id"])
     embed = slot_info_embed(slot, user, channel)
@@ -838,13 +838,13 @@ async def check_expired_slots():
             await channel.set_permissions(channel.guild.default_role, read_messages=False)
             await channel.set_permissions(user, read_messages=True, send_messages=False)
             await channel.send(embed=timestamp_embed(
-                f"{CONFIG['EMOJIS']['cancel/cross']} Slot Expired",
+                f"{CONFIG['EMOJIS']['cross']} Slot Expired",
                 "Your slot has expired. Contact staff for renewal.",
                 discord.Color.dark_gray()
             ))
 
             await dm_user(user,
-                f"{CONFIG['EMOJIS']['cancel/cross']} Slot Expired",
+                f"{CONFIG['EMOJIS']['cross']} Slot Expired",
                 "Your slot on **Slotify** has expired. Contact staff to renew.",
                 discord.Color.dark_gray()
             )
@@ -852,7 +852,7 @@ async def check_expired_slots():
             log_chan = bot.get_channel(ADMIN_LOG_CHANNEL)
             if log_chan:
                 await log_chan.send(embed=timestamp_embed(
-                    f"{CONFIG['EMOJIS']['cancel/cross']} Slot Expired",
+                    f"{CONFIG['EMOJIS']['cross']} Slot Expired",
                     f"Slot for {user.mention} auto-expired.",
                     discord.Color.dark_gray()
                 ))
@@ -1046,11 +1046,11 @@ async def on_message(message):
                 save_json(SLOTS_FILE, slots)
 
                 await channel.send(embed=timestamp_embed(
-                    f"{CONFIG['EMOJIS']['cancel/cross']} Slot Revoked",
+                    f"{CONFIG['EMOJIS']['cross']} Slot Revoked",
                     "Your slot was auto-revoked for ping abuse.",
                     discord.Color.red()
                 ))
-                await dm_user(user, f"{CONFIG['EMOJIS']['cancel/cross']} Slot Revoked", "Your slot was revoked due to ping abuse.", discord.Color.red())
+                await dm_user(user, f"{CONFIG['EMOJIS']['cross']} Slot Revoked", "Your slot was revoked due to ping abuse.", discord.Color.red())
 
                 log_chan = bot.get_channel(ADMIN_LOG_CHANNEL)
                 if log_chan:
@@ -1098,16 +1098,16 @@ async def transfer(ctx, old_user: discord.Member, new_user: discord.Member):
     uid_new = str(new_user.id)
 
     if uid_old not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} The source user does not have an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} The source user does not have an active slot.", color=discord.Color.red()))
     
     if uid_new in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} The target user already has an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} The target user already has an active slot.", color=discord.Color.red()))
 
     slot = slots[uid_old]
     channel = bot.get_channel(slot['channel_id'])
 
     if not channel:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.", color=discord.Color.red()))
 
     # Update channel permissions
     await channel.set_permissions(old_user, overwrite=None)
@@ -1157,19 +1157,19 @@ async def rename(ctx, user: discord.Member, *, new_name: str):
     uid = str(user.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} User does not have an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} User does not have an active slot.", color=discord.Color.red()))
 
     slot = slots[uid]
     channel = bot.get_channel(slot["channel_id"])
 
     if not channel:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Slot channel not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Slot channel not found.", color=discord.Color.red()))
 
     new_name = new_name.lower().replace(" ", "-")
     await channel.edit(name=new_name)
 
-    await channel.send(embed=timestamp_embed(f"{CONFIG['EMOJIS']['rename/pencil']} Slot Renamed", f"Slot has been renamed to `{new_name}` by staff.", discord.Color.orange()))
-    await dm_user(user, f"{CONFIG['EMOJIS']['rename/pencil']} Slot Renamed", f"Your slot has been renamed to `{new_name}` by the staff.", discord.Color.orange())
+    await channel.send(embed=timestamp_embed(f"{CONFIG['EMOJIS']['rename_pencil']} Slot Renamed", f"Slot has been renamed to `{new_name}` by staff.", discord.Color.orange()))
+    await dm_user(user, f"{CONFIG['EMOJIS']['rename_pencil']} Slot Renamed", f"Your slot has been renamed to `{new_name}` by the staff.", discord.Color.orange())
 
     await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['tick']} Renamed slot for {user.mention} to `{new_name}`.", color=discord.Color.green()))
     
@@ -1178,20 +1178,20 @@ async def rename(ctx, user: discord.Member, *, new_name: str):
 async def move(ctx, user: discord.Member, new_plan: str):
     new_plan = new_plan.lower()
     if new_plan not in CATEGORIES:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Invalid plan. Choose from: prime, blaze, trail", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Invalid plan. Choose from: {', '.join(CATEGORIES.keys())}", color=discord.Color.red()))
 
     slots = load_json(SLOTS_FILE)
     uid = str(user.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} User does not have an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} User does not have an active slot.", color=discord.Color.red()))
 
     slot = slots[uid]
     channel = bot.get_channel(slot["channel_id"])
     new_category = ctx.guild.get_channel(CATEGORIES[new_plan])
 
     if not channel or not new_category:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Channel or new category not found.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Channel or new category not found.", color=discord.Color.red()))
 
     await channel.edit(category=new_category)
     slot["plan"] = new_plan
@@ -1208,7 +1208,7 @@ async def timeleft(ctx):
     uid = str(ctx.author.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} You don't own an active slot.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} You don't own an active slot.", color=discord.Color.red()))
 
     slot = slots[uid]
     now = int(datetime.datetime.utcnow().timestamp())
@@ -1216,7 +1216,7 @@ async def timeleft(ctx):
     seconds_left = end - now
 
     if seconds_left <= 0:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Your slot has already expired.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Your slot has already expired.", color=discord.Color.red()))
 
     delta = datetime.timedelta(seconds=seconds_left)
     embed = discord.Embed(
@@ -1224,7 +1224,7 @@ async def timeleft(ctx):
         description=f"Your slot will expire in **{str(delta)}**.",
         color=discord.Color.orange()
     )
-    embed.set_footer(text=".gg/elitemp | Time Tracker")
+    embed.set_footer(text=".gg/vexus | Time Tracker")
     await ctx.send(embed=embed)
     
 @bot.command()
@@ -1252,7 +1252,7 @@ async def slotstats(ctx):
     for plan, count in plan_counts.items():
         embed.add_field(name=f"{plan.title()} Slots", value=f"`{count}`", inline=True)
 
-    embed.set_footer(text=".gg/elitemp | Slot Overview")
+    embed.set_footer(text=".gg/vexus | Slot Overview")
     await ctx.send(embed=embed)
     
 @bot.command()
@@ -1299,7 +1299,7 @@ async def clean(ctx, user: discord.Member):
     uid = str(user.id)
 
     if uid not in slots:
-        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} This user does not have a slot record.", color=discord.Color.red()))
+        return await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} This user does not have a slot record.", color=discord.Color.red()))
     
     slot = slots[uid]
     channel_id = slot.get("channel_id")
@@ -1457,7 +1457,7 @@ async def purge(ctx):
 async def help(ctx):
     embed = discord.Embed(
         title=f"{CONFIG['EMOJIS']['message']} Help Menu • Slot Commands",
-        description="# EliteSlots Bot — Full Command List\n\n**Note:** Commands marked with {CONFIG['EMOJIS']['shield']} require administrator permissions.",
+        description="# VexusSlots Bot — Full Command List\n\n**Note:** Commands marked with {CONFIG['EMOJIS']['shield']} require administrator permissions.",
         color=discord.Color.green()  # ← Green embed color
     )
 
@@ -1495,7 +1495,7 @@ async def help(ctx):
         inline=False
     )
 
-    embed.set_footer(text=".gg/elitemp | EliteSlots Help Panel")
+    embed.set_footer(text=".gg/vexus | VexusSlots Help Panel")
     await ctx.send(embed=embed)  
 
 
@@ -1781,11 +1781,11 @@ async def on_member_join(member):
 @unhold.error
 async def admin_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} You don't have permission to use this command.", color=discord.Color.red()))
+        await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} You don't have permission to use this command.", color=discord.Color.red()))
     elif isinstance(error, commands.BadArgument):
-        await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} Invalid argument. Please check your input.", color=discord.Color.red()))
+        await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} Invalid argument. Please check your input.", color=discord.Color.red()))
     else:
-        await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cancel/cross']} An error occurred: {error}", color=discord.Color.red()))
+        await ctx.send(embed=discord.Embed(description=f"{CONFIG['EMOJIS']['cross']} An error occurred: {error}", color=discord.Color.red()))
 
         
 # --- Run the bot ---
